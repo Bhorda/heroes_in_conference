@@ -36,6 +36,6 @@ public class SwipeControl : MonoBehaviour
             moveTo += new Vector3(0, 0, -20);
         }
 
-        box.transform.position = Vector3.MoveTowards(box.position, box.position + 5*moveTo, 3f * Time.deltaTime);
+        box.transform.position = Vector3.MoveTowards(box.position, box.position + 5*moveTo, Time.deltaTime);
     }
 }
