@@ -1,5 +1,5 @@
 using System.Collections;
-using Sytem.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Swipe : MonoBehaviour
@@ -28,11 +28,13 @@ public class Swipe : MonoBehaviour
 			delta = Input.GetTouch(0).position - origin;
 		}
 
+		// Check if swipe vector is past deadzone
 		if (delta.magnitude > 150)
 		{
 			float x = delta.x;
 			float y = delta.y;
 
+			// Act accordingly for the directions
 			if (Mathf.Abs(x) > Mathf.Abs(y))
 			{
 				if (x > 0) right = true;

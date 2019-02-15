@@ -24,11 +24,12 @@ public class KeyPad : MonoBehaviour
 
 	void Update()
 	{
+		// If 4 values have been entered, reset the counter, check if correct, act accordingly
 		if (pushCount == 4)
 		{
 			pushCount = 0;
 			// Change values for custom code
-			if (code[0] == 1 && code[1] == 2 && code[2] == 3 && code[3] == 4)
+			if (inputCode[0] == 1 && inputCode[1] == 2 && inputCode[2] == 3 && inputCode[3] == 4)
 			{
 				renderer.material = material;
 			}
@@ -44,10 +45,11 @@ public class KeyPad : MonoBehaviour
 		{
 			Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
 
-			if (Physics.Raycast(ray, out RaycastHit hit)
+			if (Physics.Raycast(ray, out RaycastHit hit))
 			{
 				buttonName = hit.transform.name;
-
+				
+				// Find which button was pressed
 				switch (buttonName)
 				{
 					case "button1" :
