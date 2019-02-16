@@ -7,7 +7,7 @@ public class ShakeDetect : MonoBehaviour
 	public GameObject sphere;
 	public Material material;
 
-	Renderer renderer;
+	Renderer sphereRenderer;
 
 	// How often to update the accelerometer
 	float updateAcceleration = 1.0f / 60.0f;
@@ -24,7 +24,7 @@ public class ShakeDetect : MonoBehaviour
 		lowPassValue = Input.acceleration;
 		// Recommended value according to certain manufacturers
 		minShake = 2.0f;
-		renderer = sphere.GetComponent<Renderer>();
+		sphereRenderer = sphere.GetComponent<Renderer>();
 	}
 
 	void Update()
@@ -35,7 +35,10 @@ public class ShakeDetect : MonoBehaviour
 
 		if (deltaAcceleration.sqrMagnitude >= minShake)
 		{
-			renderer.material = material;
+			if (sphereRenderer.isVisible)
+			{
+				sphereRenderer.material = material;
+			}
 		}
 	}
 }
