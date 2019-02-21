@@ -4,20 +4,20 @@ using UnityEngine;
 
 public class MicDetect : MonoBehaviour
 {
-	public GameObject sphere;
-	public Material material;
+    public GameObject sphere;
+    public Material material;
 
-	private Renderer renderer;
-	private string device;
+    private Renderer renderer;
+    private string device;
 
-	float volume;
-	AudioClip record; //clipRecord
-	bool isOn;
+    float volume;
+    AudioClip record; //clipRecord
+    bool isOn;
 
-	void Start()
-	{
-		renderer = sphere.GetComponent<Renderer>();
-	}
+    void Start()
+    {
+        renderer = sphere.GetComponent<Renderer>();
+    }
 
 	//mic initialization
 	public void InitMic()

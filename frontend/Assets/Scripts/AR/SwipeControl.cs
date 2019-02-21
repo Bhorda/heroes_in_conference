@@ -36,7 +36,7 @@ public class SwipeControl : MonoBehaviour
 			moveTo += new Vector3 (-20, 0, 0);
 		}
 
-		// Move box towards the new transform vector in 1 unit of time (seconds)
-		box.position = Vector3.MoveTowards(box.position, box.position + 5*moveTo, 1);
+		// Move box towards the new transform vector in 1 second (1 * fps)
+		box.position = Vector3.MoveTowards(box.position, box.position + 5*moveTo, 20*Time.deltaTime);
 	}
 }

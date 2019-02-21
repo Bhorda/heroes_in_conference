@@ -25,6 +25,7 @@ public class ShakeDetect : MonoBehaviour
 		// Recommended value according to certain manufacturers
 		minShake = 2.0f;
 		sphereRenderer = sphere.GetComponent<Renderer>();
+		sphere.SetActive(false);
 	}
 
 	void Update()
@@ -35,9 +36,19 @@ public class ShakeDetect : MonoBehaviour
 
 		if (deltaAcceleration.sqrMagnitude >= minShake)
 		{
-			if (sphereRenderer.isVisible)
+			sphere.SetActive(true);
+		}
+
+		if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+		{
+			Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+
+			if (Physics.Raycast(ray, out RaycastHit hit))
 			{
-				sphereRenderer.material = material;
+				if (hit.transform.name.Equals(sphere.name))
+				{
+					sphereRenderer.material = material;
+				}
 			}
 		}
 	}

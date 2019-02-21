@@ -8,12 +8,12 @@ public class ResourceGather : MonoBehaviour
 	public Material collected;	
 
 	int hitCounter;
-	Renderer renderer;
+	Renderer sphereRenderer;
 
 	void Start()
 	{
 		hitCounter = 0;
-		renderer = resource.GetComponent<Renderer>();
+		sphereRenderer = resource.GetComponent<Renderer>();
 	}
 
 	void Update()
@@ -29,7 +29,7 @@ public class ResourceGather : MonoBehaviour
 
 			if (hitCounter == 3)
 			{
-				renderer.material = collected;
+				sphereRenderer.material = collected;
 			}
 		}
 	}
