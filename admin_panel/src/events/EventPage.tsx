@@ -6,10 +6,10 @@ import {AppDispatch} from "../store/appStore";
 import {connect} from "react-redux";
 import {Event} from "./Event";
 import {Container} from "../store/Container";
-import {loadEvents} from "../store/actions/LoadEvents";
+import {loadEvents} from "../store/actions/events/LoadEvents";
 import {DateTimeLocal} from "../util/DateTimeLocal";
-import {updateEvent} from "../store/actions/UpdateEvent";
-import {deleteEvent} from "../store/actions/DeleteEvent";
+import {updateEvent} from "../store/actions/events/UpdateEvent";
+import {deleteEvent} from "../store/actions/events/DeleteEvent";
 
 interface RouteParams {
     id: string,
@@ -86,11 +86,6 @@ class UnconnectedEventPage extends React.Component<Props, State> {
                     <label htmlFor="name">Event Name</label>
                     <input type="text" className="form-control" id="name"
                            placeholder="Event Name" value={event.name} onChange={this.textChanged}/>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="location">Location</label>
-                    <input type="text" className="form-control" id="location"
-                           placeholder="RuneFest 2019" value={event.location} onChange={this.textChanged}/>
                 </div>
                 <div className="form-group">
                     <label htmlFor="startTime">Start Time</label>
@@ -203,7 +198,7 @@ class UnconnectedEventPage extends React.Component<Props, State> {
             })
             .catch(reason => {
                 this.setState({
-                    statusMessage: "Failed to save",
+                    statusMessage: `Failed to save: ${reason}`,
                 });
             });
     };

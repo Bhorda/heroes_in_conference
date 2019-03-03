@@ -5,7 +5,7 @@ import {connect} from "react-redux";
 import {AppState} from "../store/AppState";
 import {IDMap} from "../store/IDMap";
 import {AppDispatch} from "../store/appStore";
-import {loadEvents} from "../store/actions/LoadEvents";
+import {loadEvents} from "../store/actions/events/LoadEvents";
 import {Container} from "../store/Container";
 import {Link, RouteComponentProps} from "react-router-dom";
 
@@ -34,9 +34,8 @@ class UnconnectedEventListPage extends React.Component<Props, {}> {
     }
 
     public componentDidMount(): void {
-        if (Container.isEmpty(this.props.allEvents)) {
-            this.props.loadEvents();
-        }
+        // reload events anyway
+        this.props.loadEvents();
     }
 
     public render(): React.ReactNode {
@@ -49,7 +48,7 @@ class UnconnectedEventListPage extends React.Component<Props, {}> {
 
         return <>
             <h1>Events</h1>
-            <button type="button" className="btn btn-primary" onClick={this.newEvent}>New Event</button>
+            <button type="button" className="btn btn-primary mb-1" onClick={this.newEvent}>New Event</button>
             <br/>
             <table className="table">
                 <thead>
@@ -58,7 +57,7 @@ class UnconnectedEventListPage extends React.Component<Props, {}> {
                     <th>Description</th>
                     <th>Start Time</th>
                     <th>End Time</th>
-                    <th>Location</th>
+                    <th>Interest</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -101,7 +100,7 @@ class EventDisplay extends React.Component<EventDisplayProps, {}> {
             <td>{this.props.event.description}</td>
             <td>{format(this.props.event.startTime, "MMM d HH:mm")}</td>
             <td>{format(this.props.event.endTime, "MMM d HH:mm")}</td>
-            <td>{this.props.event.location || "None"}</td>
+            <td>{this.props.event.count}</td>
         </tr>;
     }
 }

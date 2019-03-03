@@ -1,2 +1,5 @@
 /data/
-/database.properties
+*.jar
+/static/
+*.properties
+server.log

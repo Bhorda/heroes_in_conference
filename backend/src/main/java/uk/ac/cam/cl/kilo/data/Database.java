@@ -60,7 +60,27 @@ public class Database {
   public List<Achievement> getAchievements() throws DatabaseException {
     try (Connection conc = getConnection()) {
       List<Achievement> result = new ArrayList<>();
-      PreparedStatement stmt = conc.prepareStatement("SELECT * FROM " + Achievement.TABLE);
+      PreparedStatement stmt =
+          conc.prepareStatement(
+              "SELECT *, COUNT("
+                  + "a."
+                  + Achievement.ACHIEVED_ACHIEVEMENT_ID_FIELD
+                  + ") AS "
+                  + Achievement.COUNT_FIELD
+                  + " FROM "
+                  + Achievement.TABLE
+                  + " LEFT JOIN "
+                  + Achievement.ACHIEVED_TABLE
+                  + " a ON "
+                  + Achievement.TABLE
+                  + "."
+                  + Achievement.ID_FIELD
+                  + " = a."
+                  + Achievement.ACHIEVED_ACHIEVEMENT_ID_FIELD
+                  + " GROUP BY "
+                  + Achievement.TABLE
+                  + "."
+                  + Achievement.ID_FIELD);
       ResultSet rs = stmt.executeQuery();
       while (rs.next()) result.add(Achievement.from(rs));
       return result;
@@ -76,7 +96,27 @@ public class Database {
   public List<Event> getEvents() throws DatabaseException {
     try (Connection conc = getConnection()) {
       List<Event> result = new ArrayList<>();
-      PreparedStatement stmt = conc.prepareStatement("SELECT * FROM " + Event.TABLE);
+      PreparedStatement stmt =
+          conc.prepareStatement(
+              "SELECT *, COUNT("
+                  + "a."
+                  + Event.INTERESTED_EVENT_ID_FIELD
+                  + ") AS "
+                  + Event.COUNT_FIELD
+                  + " FROM "
+                  + Event.TABLE
+                  + " LEFT JOIN "
+                  + Event.INTERESTED_TABLE
+                  + " a ON "
+                  + Event.TABLE
+                  + "."
+                  + Event.ID_FIELD
+                  + " = a."
+                  + Event.INTERESTED_EVENT_ID_FIELD
+                  + " GROUP BY "
+                  + Event.TABLE
+                  + "."
+                  + Event.ID_FIELD);
       ResultSet rs = stmt.executeQuery();
       while (rs.next()) result.add(Event.from(rs));
       return result;
@@ -135,6 +175,69 @@ public class Database {
       ResultSet rs = stmt.executeQuery();
       while (rs.next()) result.add(ConferenceMap.from(rs));
       return result;
+    } catch (SQLException e) {
+      throw new DatabaseException(e);
+    }
+  }
+
+  /**
+   * @return the usage statistics for the last 24 hours
+   * @throws DatabaseException if the database could not be accessed
+   */
+  public List<UsageStatistic> getUsage() throws DatabaseException {
+    try (Connection conc = getConnection()) {
+      List<UsageStatistic> result = new ArrayList<>();
+      PreparedStatement stmt =
+          conc.prepareStatement(
+              "SELECT * FROM "
+                  + UsageStatistic.TABLE
+                  + " WHERE "
+                  + UsageStatistic.TIME_FIELD
+                  + " >= DATE_SUB(NOW(), INTERVAL 1 DAY)");
+      ResultSet rs = stmt.executeQuery();
+      while (rs.next()) result.add(UsageStatistic.from(rs));
+      return result;
+    } catch (SQLException e) {
+      throw new DatabaseException(e);
+    }
+  }
+
+  /**
+   * @param query the name string to query for
+   * @param n the number of users to get
+   * @return the list of users with a name similar to the given name
+   * @throws DatabaseException if the database could not be accessed
+   */
+  public List<User> getUsersWithNameSimilarTo(String query, int n) throws DatabaseException {
+    // Escape for 'like' query
+    query = query.replace("!", "!!").replace("%", "!%").replace("_", "!_").replace("[", "![");
+    try (Connection conc = getConnection()) {
+      List<User> result = new ArrayList<>();
+      if (query == null | query.equals("") | n <= 0) return result;
+      PreparedStatement stmt =
+          conc.prepareStatement(
+              "SELECT * FROM " + User.TABLE + " WHERE " + User.NAME_FIELD + " LIKE ? LIMIT ?");
+      // Prefix and suffix match
+      stmt.setString(1, "%" + query + "%");
+      stmt.setInt(2, n);
+      ResultSet rs = stmt.executeQuery();
+      while (rs.next()) result.add(User.from(rs));
+      return result;
+    } catch (SQLException e) {
+      throw new DatabaseException(e);
+    }
+  }
+
+  /**
+   * @return the number of users registered with the system
+   * @throws DatabaseException if the database could not be accessed
+   */
+  public int getUserCount() throws DatabaseException {
+    try (Connection conc = getConnection()) {
+      PreparedStatement stmt = conc.prepareStatement("SELECT COUNT(*) FROM " + User.TABLE);
+      ResultSet rs = stmt.executeQuery();
+      if (!rs.first()) throw new DatabaseException("COUNT(*) returned no records");
+      return rs.getInt(1);
     } catch (SQLException e) {
       throw new DatabaseException(e);
     }
