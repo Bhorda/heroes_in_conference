@@ -4,96 +4,108 @@ using UnityEngine;
 
 public class KeyPad : MonoBehaviour
 {
+    // Main asset
+    public GameObject obj;
+    // Keypad collider objects
 	public GameObject[] numpad;
-	public GameObject sphere;
-	public Material material;
-	public AudioSource audioSource;
-	public AudioClip audioClip;
+    // Keypad visual markers
+    public GameObject[] shells;
 
-	string buttonName;
+    public GameObject hint;
+    public GameObject hintsphere;
+
+    // Feedback requirements
+    public GameObject[] feedbackMarker;
+    public Material[] feedbackMaterial;
+
 	int[] inputCode;
-	Renderer renderer;
 	int pushCount;
 
+    // Initial setup of imagetarget: activating assets, creating code input array
 	void Start()
 	{
 		inputCode = new int[4];
-		renderer = sphere.GetComponent<Renderer>();
-		pushCount = 0;
+        hint.SetActive(false);
+        hintsphere.SetActive(false);
+        for (int i = 0; i < numpad.Length; i++)
+        {
+            numpad[i].SetActive(!NetworkDatabase.NDB.GetAchievementObjByName("Crab rave").Won);
+            shells[i].SetActive(!NetworkDatabase.NDB.GetAchievementObjByName("Crab rave").Won);
+        }
+
+        for (int i = 0; i < feedbackMarker.Length; i++)
+        {
+            feedbackMarker[i].SetActive(!NetworkDatabase.NDB.GetAchievementObjByName("Crab rave").Won);
+        }
+
+
+        pushCount = 0;
 	}
 
 	void Update()
 	{
-		// If 4 values have been entered, reset the counter, check if correct, act accordingly
-		if (pushCount == 4)
+        // If 4 values have been entered, reset the counter, check if correct, act accordingly
+        if (pushCount == 4)
 		{
 			pushCount = 0;
 			// Change values for custom code
 			if (inputCode[0] == 1 && inputCode[1] == 2 && inputCode[2] == 3 && inputCode[3] == 4)
 			{
-				renderer.material = material;
-			}
+				for (int i = 0; i < numpad.Length; i++)
+                {
+                    Destroy(numpad[i]);
+                    Destroy(shells[i]);
+                    Destroy(feedbackMarker[i]);
+                }
+                hint.SetActive(true);
+                hintsphere.SetActive(true);
+            }
 
 			else
-			{
-				audioSource.clip = audioClip;
-				audioSource.Play();
+            {
+                // Reset feedbackMarker materials
+                for (int i = 0; i < feedbackMarker.Length; i++)
+                {
+                    SimpleChangeMaterial(feedbackMarker[i], feedbackMaterial[0]);
+                }
 			}
 		}
 
-		if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+		// Find which button was pressed
+		switch (ARHandler.GetHitIfAny())
 		{
-			Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
-
-			if (Physics.Raycast(ray, out RaycastHit hit))
-			{
-				buttonName = hit.transform.name;
-				
-				// Find which button was pressed
-				switch (buttonName)
-				{
-					case "button1" :
-						inputCode[pushCount] = 1;
-						pushCount++;
-						break;
-					case "button2" :
-						inputCode[pushCount] = 2;
-						pushCount++;
-						break;
-					case "button3" :
-						inputCode[pushCount] = 3;
-						pushCount++;
-						break;
-					case "button4" :
-						inputCode[pushCount] = 4;
-						pushCount++;
-						break;
-					case "button5" :
-						inputCode[pushCount] = 5;
-						pushCount++;
-						break;
-					case "button6" :
-						inputCode[pushCount] = 6;
-						pushCount++;
-						break;
-					case "button7" :
-						inputCode[pushCount] = 7;
-						pushCount++;
-						break;
-					case "button8" :
-						inputCode[pushCount] = 8;
-						pushCount++;
-						break;
-					case "button9" :
-						inputCode[pushCount] = 9;
-						pushCount++;
-						break;
-					case "button0" :
-						inputCode[pushCount] = 0;
-						pushCount++;
-						break;
-				}
-			}
+			case "key1" :
+				inputCode[pushCount] = 1;
+                SimpleChangeMaterial(feedbackMarker[pushCount], feedbackMaterial[1]);
+                pushCount++;
+				break;
+			case "key2" :
+                inputCode[pushCount] = 2;
+                SimpleChangeMaterial(feedbackMarker[pushCount], feedbackMaterial[1]);
+                pushCount++;
+                break;
+			case "key3" :
+				inputCode[pushCount] = 3;
+                SimpleChangeMaterial(feedbackMarker[pushCount], feedbackMaterial[1]);
+                pushCount++;
+                break;
+			case "key4" :
+				inputCode[pushCount] = 4;
+                SimpleChangeMaterial(feedbackMarker[pushCount], feedbackMaterial[1]);
+                pushCount++;
+                break;
+            case "hintsphere":
+                Destroy(hint);
+                Destroy(hintsphere);
+                ARHandler.GetAchievement("Crab rave");
+                break;
+            default:
+                break;
 		} 
 	}
+
+    void SimpleChangeMaterial(GameObject o, Material mat)
+    {
+        o.GetComponent<Renderer>().material = mat;
+    }
 }

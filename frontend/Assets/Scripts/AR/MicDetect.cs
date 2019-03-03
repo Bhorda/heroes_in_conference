@@ -4,20 +4,28 @@ using UnityEngine;
 
 public class MicDetect : MonoBehaviour
 {
-    public GameObject sphere;
-    public Material material;
+    // Main challenge asset
+    public GameObject obj;
+    // Environmental game objects
+    public GameObject[] environment;
+    public GameObject hint;
+    public GameObject hintsphere;
 
-    private Renderer renderer;
+    // Microphone requirements
     private string device;
+
+    // 'obj' renderer
+    SkinnedMeshRenderer skin;
+
+    // 'obj' animation setup
+    Animator anim;
+    int scare = Animator.StringToHash("dance");
+    bool complete;
+    Vector3 moveTo;
 
     float volume;
     AudioClip record; //clipRecord
     bool isOn;
-
-    void Start()
-    {
-        renderer = sphere.GetComponent<Renderer>();
-    }
 
 	//mic initialization
 	public void InitMic()
@@ -60,22 +68,45 @@ public class MicDetect : MonoBehaviour
 
 	void Update()
 	{
-		// levelMax equals to the highest normalized value power 2, a small number because < 1
-		// pass the value to a static var so we can access it from anywhere
-		volume = MicrophoneLevelMax();
+        // levelMax equals to the highest normalized value power 2, a small number because < 1
+        // pass the value to a static var so we can access it from anywhere
+        if (obj.GetComponentInChildren<SkinnedMeshRenderer>().isVisible)
+        {
 
-		if (volume > 0.001 && renderer.isVisible)
-		{
-			renderer.material = material;
-		}
+            volume = MicrophoneLevelMax();
+
+            if (volume > 0.04 && !complete && skin.isVisible)
+            {
+                anim.SetTrigger(scare);
+                obj.transform.Rotate(0, 180, 0);
+                obj.transform.position = Vector3.MoveTowards(obj.transform.position, obj.transform.position - moveTo, Time.deltaTime * 1200);
+                complete = true;
+                hint.SetActive(true);
+                hintsphere.SetActive(true);
+            }
+
+            if (ARHandler.GetHitIfAny().Equals(hintsphere.name))
+            {
+                // Waiting for finalised achievement list
+                Destroy(hint);
+                ARHandler.GetAchievement("TNT I'm Zygomite!");
+            }
+        }    
 	}
 
 	// start mic when scene starts
-	void OnEnable()
+	void Start()
 	{
 		InitMic();
 		isOn = true;
-	}
+        complete = false;
+        anim = obj.GetComponent<Animator>();
+        moveTo = new Vector3(0, 0, 0.2f);
+        hint.SetActive(false);
+        hintsphere.SetActive(false);
+        obj.SetActive(!NetworkDatabase.NDB.GetAchievementObjByName("TNT I'm Zygomite!").Won);
+        skin = obj.GetComponentInChildren<SkinnedMeshRenderer>();
+    }
 
 	//stop mic when loading a new level or quit application
 	void OnDisable()

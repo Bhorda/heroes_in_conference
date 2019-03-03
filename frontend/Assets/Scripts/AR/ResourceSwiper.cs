@@ -6,27 +6,26 @@ public class ResourceSwiper : MonoBehaviour
 {
 	public GameObject resource;
 	public Swipe swipe;
-	public AudioClip chop;
-	public AudioSource audioSource;
 
 	int swipeCount;
+    MeshRenderer meshRenderer;
 
 	void Start()
 	{
 		swipeCount = 0;
-		audioSource = gameObject.GetComponent<AudioSource>();
-	}
+        meshRenderer = resource.GetComponent<MeshRenderer>();
+
+    }
 
 	void Update()
 	{
-		if (swipe.GetLeft() || swipe.GetRight())
+        if ((swipe.GetLeft() || swipe.GetRight()) && meshRenderer.isVisible)
 		{
 			swipeCount++;
 		}
-		if (swipeCount > 3)
+		if (swipeCount == 2)
 		{
-			// Add to inventory
-			resource.SetActive(false);
+            Destroy(resource); 
 		}
 	}
 }

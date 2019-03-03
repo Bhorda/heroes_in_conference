@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ResourceGather : MonoBehaviour
+public class Ore1 : MonoBehaviour
 {
     public GameObject resource;
     public GameObject obj;
@@ -13,7 +13,9 @@ public class ResourceGather : MonoBehaviour
 	void Start()
 	{
         hitCounter = 0;
-        resourceCollected.SetActive(false);
+        resource.SetActive(!NetworkDatabase.NDB.GetAchievementObjByName("Grumpy").Won);
+        obj.SetActive(!NetworkDatabase.NDB.GetAchievementObjByName("Grumpy").Won);
+        resourceCollected.SetActive(NetworkDatabase.NDB.GetAchievementObjByName("Grumpy").Won);
 	}
 
 	void Update()
@@ -28,6 +30,7 @@ public class ResourceGather : MonoBehaviour
             Destroy(resource);
             resourceCollected.SetActive(true);
             Destroy(obj);
+            ARHandler.GetAchievement("Grumpy");
 		}
 	}
 }

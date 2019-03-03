@@ -4,24 +4,23 @@ using UnityEngine;
 
 public class Swipe : MonoBehaviour
 {
-	private bool touch, up, down, left, right, inMotion;
+	private bool touch, up, down, left, right;
 	private Vector2 origin, delta;	
 
-	void Start()
+	void Update()
 	{
-		touch = up = down = left = right = false;
+            touch = up = down = left = right = false;
 
 		// Detect touch
 		if (Input.touchCount > 0)
 		{
 			if (Input.GetTouch(0).phase == TouchPhase.Began)
 			{
-				touch = inMotion = true;
+				touch =true;
 				origin = Input.GetTouch(0).position;
 			}
 			else if (Input.GetTouch(0).phase == TouchPhase.Canceled || Input.GetTouch(0).phase == TouchPhase.Ended)
 			{
-				inMotion = false;
 				Reset();
 			}
 			
@@ -29,7 +28,7 @@ public class Swipe : MonoBehaviour
 		}
 
 		// Check if swipe vector is past deadzone
-		if (delta.magnitude > 150)
+		if (delta.magnitude > 20)
 		{
 			float x = delta.x;
 			float y = delta.y;
@@ -53,7 +52,6 @@ public class Swipe : MonoBehaviour
 	private void Reset()
 	{
 		origin = delta = Vector2.zero;
-		inMotion = false;
 	}
 
 	public bool GetUp()

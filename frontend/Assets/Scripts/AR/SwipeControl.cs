@@ -4,39 +4,76 @@ using UnityEngine;
 
 public class SwipeControl : MonoBehaviour
 {
-	public Swipe swipe;
-	public Transform box;
+    public Swipe swipe;
+    public GameObject obj;
+    public GameObject obj2;
+    public GameObject hint;
+    public GameObject hintsphere;
 
-	private Vector3 moveTo;
+    public GameObject[] planks;
 
-	void Start()
-	{
-		moveTo = box.position;
-	}
+    Vector3 moveTo;
 
-	void Update()
-	{
-		moveTo = Vector3.zero;
+    int which;
 
-		// Based on swipe, manipulate transform vector
-		if (swipe.GetUp())
-		{
-			moveTo += new Vector3 (0, 0, 20);
-		}
-		if (swipe.GetDown())
-		{
-			moveTo += new Vector3 (0, 0, -20);
-		}
-		if (swipe.GetLeft())
-		{
-			moveTo += new Vector3 (20, 0, 0);
-		}
-		if (swipe.GetRight())
-		{
-			moveTo += new Vector3 (-20, 0, 0);
-		}
+    void Start()
+    {
+        moveTo = obj.transform.position;
+        hint.SetActive(!NetworkDatabase.NDB.GetAchievementObjByName("Yak whisperer").Won);
+        hintsphere.SetActive(!NetworkDatabase.NDB.GetAchievementObjByName("Yak whisperer").Won);
+        for (int i = 0; i < planks.Length; ++i)
+        {
+            planks[i].SetActive(!NetworkDatabase.NDB.GetAchievementObjByName("Yak whisperer").Won);
+        }
 
-		// Move box towards the new transform vector in 1 second (1 * fps)
-		box.position = Vector3.MoveTowards(box.position, box.position + 5*moveTo, 20*Time.deltaTime);
-	}
+        which = 0;
+    }
+
+    void Update()
+    {
+        // TODO: fix directions
+        if (obj.GetComponentInChildren<SkinnedMeshRenderer>().isVisible)
+        {
+            string item = ARHandler.GetHitIfAny();
+
+            moveTo = Vector3.zero;
+
+            // Based on swipe, manipulate transform vector
+            if (swipe.GetUp())
+            {
+                moveTo += new Vector3(0, 0, 0.001f);
+            }
+            if (swipe.GetDown())
+            {
+                moveTo += new Vector3(0, 0, -0.001f);
+            }
+            if (swipe.GetLeft())
+            {
+                moveTo += new Vector3(0.001f, 0, 0);
+            }
+            if (swipe.GetRight())
+            {
+                moveTo += new Vector3(-0.001f, 0, 0);
+            }
+
+            //moveTo = new Vector3(-0.001f, 0, 0);
+
+            if ((planks[which].transform.position - hint.transform.position).magnitude < 0.3f)
+            {
+                planks[which].transform.position = Vector3.MoveTowards(planks[which].transform.position, planks[which].transform.position + 5 * moveTo, 20 * Time.deltaTime);
+            }
+            else
+            {
+                if (which < 4)
+                which++;
+            }
+
+            if (ARHandler.GetHitIfAny().Equals(hintsphere.name))
+            {
+                Destroy(hint);
+                Destroy(hintsphere);
+                ARHandler.GetAchievement("Yak whisperer");
+            }
+        }
+    }
 }

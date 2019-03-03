@@ -4,50 +4,100 @@ using UnityEngine;
 
 public class QuicktimeEvent : MonoBehaviour
 {
-    public GameObject sphere;
-    public Material material;
+    public GameObject obj;
+    public GameObject[] fish;
 
-    private Renderer renderer;
+    public GameObject[] hitSphere;
+
+    public GameObject[] feedbackMarker;
 
     float probability;
     int reactionFrames;
 
-
     void Start()
     {
-        renderer = sphere.GetComponent<MeshRenderer>();
-        sphere.SetActive(false);
-	// Change this value to make sphere appear more often
+        for (int i = 0; i < fish.Length; ++i)
+        {
+            fish[i].SetActive(false);
+            hitSphere[i].SetActive(false);
+
+            feedbackMarker[i].SetActive(false);
+        }
+
+        // Change this value to make sphere appear more often
         probability = 0.3f;
         reactionFrames = 0;
     }
 
     void Update()
     {
-	if (reactionFrames > 0)
+        // If fish are toggled
+        if (reactionFrames > 0)
         {
             reactionFrames--;
-            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
-            {
-                Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
 
-                if (Physics.Raycast(ray, out RaycastHit hit))
+            string hit = ARHandler.GetHitIfAny();
+
+            if (hit.Equals(hitSphere[0].transform.name))
+            {
+                Destroy(fish[0]);
+                Destroy(hitSphere[0]);
+                feedbackMarker[0].SetActive(true);
+                ARHandler.GetAchievement("Finding Nome");
+            }
+
+            if (hit.Equals(hitSphere[0].transform.name))
+            {
+                Destroy(fish[1]);
+                Destroy(hitSphere[1]);
+                feedbackMarker[1].SetActive(true);
+                ARHandler.GetAchievement("Finding Dyro");
+            }
+        } 
+        else 
+        {
+            // Toggle one fish at a time
+            float selector = Random.value;
+            if (selector < 0.5f)
+            {
+                if (fish[0] != null && hitSphere[0] != null)
                 {
-                    renderer.material = material;
+                    fish[0].SetActive(false);
+                    hitSphere[0].SetActive(false);
                 }
             }
-        }
-        else
-        {
-		sphere.SetActive(false);
-		float rand = Random.value;
-		print(rand);
+            else
+            {
+                if (fish[0] != null && hitSphere[0] != null)
+                {
+                    fish[1].SetActive(false);
+                    hitSphere[1].SetActive(false);
+                }
+            }
+
+            float rand = Random.value;
             if (rand < probability)
             {
-		// Show sphere for 1 second at a time
-                reactionFrames = (int) (1.0f / Time.deltaTime);
-		sphere.SetActive(true);
-	    }
+    		    // Show sphere for 1 second at a time
+                reactionFrames = (int) (0.5f / Time.deltaTime);
+
+                if (selector < 0.5f)
+                {
+                    if (fish[0] != null && hitSphere[0] != null)
+                    {
+                        fish[0].SetActive(true);
+                        hitSphere[0].SetActive(true);
+                    }
+                }
+                else
+                {
+                    if (fish[0] != null && hitSphere[0] != null)
+                    {
+                        fish[1].SetActive(true);
+                        hitSphere[1].SetActive(true);
+                    }
+                }
+            }
         }
     }
 }
